@@ -109,7 +109,11 @@
 				(("\\(let\\* \\(\\(toplevel \\(current-toplevel\\)\\)")
 				 "(let* ((toplevel (original-current-toplevel))")
 				(("\\(current-toplevel\\) file\\)\\)\\)")
-				"(original-current-toplevel) file)))"))				
+				"(original-current-toplevel) file)))")
+				(("\\(if \\(current-toplevel\\)")
+				 "(if (original-current-toplevel)")
+				(("\\(format \\#f \"~a/pub/~a\" \\(current-toplevel\\) path\\)")
+				 "(format #f \"~a/pub/~a\" (original-current-toplevel) path)"))				
 		   (substitute* "artanis/env.scm"			      			       
 				(("            current-toplevel\n")
 				 "            current-toplevel\n            %original-current-toplevel\n            original-current-toplevel\n")
@@ -118,7 +122,7 @@
 				(("  \\(or \\(%current-toplevel\\)\n")
 					 "  (define (original-current-toplevel)\n")
 				(("      \\(find-ENTRY-path identity #t\\)\\)\\)\n")
-				 "     (or (%original-current-toplevel)\n         (find-ENTRY-path identity #t)))\n\n(define (current-toplevel) \"/tmp/limsn\")")))
+				 "     (or (%original-current-toplevel)\n         (find-ENTRY-path identity #t)))\n\n(define (current-toplevel) \"/tmp/limsn\")"))
 	;;============END forguix mods=========================================================================
 				   
                    (substitute* "artanis/artanis.scm"

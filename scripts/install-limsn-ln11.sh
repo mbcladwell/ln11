@@ -101,18 +101,24 @@ guixinstall()
 
   ## using guile-3.0.2
     guix install glibc-utf8-locales guile-dbi gnuplot
+    source /home/admin/.guix-profile/etc/profile
     sudo guix install glibc-utf8-locales
     export GUIX_LOCPATH="$HOME/.guix-profile/lib/locale"
              
     guix package --install-from-file=/home/admin/ln11/artanis52.scm
+    source /home/admin/.guix-profile/etc/profile
 
     mkdir /tmp/limsn
+    mkdir /tmp/limsn/tmp
+    mkdir /tmp/limsn/tmp/cache
+    
     mkdir /home/admin/.configure
     mkdir /home/admin/.configure/limsn
     cp /home/admin/limsn/limsn/conf/artanis.conf /home/admin/.configure/limsn
 
     sudo sed -i "s/host.name = 127.0.0.1/host.name = $IPADDRESS/" /home/admin/.configure/limsn/artanis.conf
-    sudo sed -i "s/cookie.maxplates = 100/cookie.maxplates = $MAXNUMPLATES/"  /home/admin/.configure/limsn/artanis.conf
+    ## must modify ENTRY now, not artanis.conf
+    sudo sed -i "s/maxnumplates = 100/maxnumplates = $MAXNUMPLATES/"  /home/admin/limsn/limsn/ENTRY
 
     
     source /home/admin/.guix-profile/etc/profile     
@@ -129,7 +135,7 @@ initdb()
 source /home/admin/.guix-profile/etc/profile 
     export LC_ALL="C"
   
-    sudo chmod -R a=rwx /home/admin/ln10
+  ##  sudo chmod -R a=rwx /home/admin/ln10
     sudo service postgresql stop
     sudo sed -i 's/host[ ]*all[ ]*all[ ]*127.0.0.1\/32[ ]*md5/host    all        all             127.0.0.1\/32        trust/' /etc/postgresql/11/main/pg_hba.conf
     sudo sed -i 's/\#listen_addresses =/listen_addresses =/'  /etc/postgresql/11/main/postgresql.conf
@@ -140,7 +146,7 @@ source /home/admin/.guix-profile/etc/profile
     psql -U ln_admin -h 127.0.0.1 -d lndb -a -f /home/admin/limsn/limsn/postgres/create-db.sql
     psql -U ln_admin -h 127.0.0.1 -d lndb -a -f /home/admin/limsn/limsn/postgres/example-data.sql   
 
- git clone https://github.com/mbcladwell/limsn.git
+ 
     
 }
 
