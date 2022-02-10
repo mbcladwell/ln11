@@ -79,9 +79,6 @@ query()
     
     echo Maximum number of plates per plate set:
     read MAXNUMPLATES
-    
-    echo Initialize database?[Y/n]
-    read INIT_DB
 }
 
 updatesys()
@@ -98,25 +95,30 @@ guixinstall()
     wget 'https://sv.gnu.org/people/viewgpg.php?user_id=127547' -qO - | sudo -i gpg --import -
 
     git clone --depth 1 https://github.com/mbcladwell/ln11.git 
-    
+    git clone --depth 1 https://github.com/mbcladwell/limsn.git 
 
-    sudo ./ln11/scripts/guix-install-mod.sh
+    sudo ./limsn/scripts/guix-install-mod.sh
 
   ## using guile-3.0.2
-    guix install glibc-utf8-locales guile-dbi 
-    source $HOME/.guix-profile/etc/profile
+    guix install glibc-utf8-locales guile-dbi gnuplot
+    source /home/admin/.guix-profile/etc/profile
     sudo guix install glibc-utf8-locales
     export GUIX_LOCPATH="$HOME/.guix-profile/lib/locale"
              
-    guix package --install-from-file=$HOME/ln11/limsn.scm
-    source $HOME/.guix-profile/etc/profile
+    guix package --install-from-file=/home/admin/ln11/artanis52.scm
+    source /home/admin/.guix-profile/etc/profile
 
-    init-limsn.sh	
-	
-    sudo sed -i "s/host.name = 127.0.0.1/host.name = $IPADDRESS/" $HOME/.configure/limsn/artanis.conf
+    mkdir -p /tmp/limsn/tmp/cache /home/admin/.configure/limsn
+     
+    cp /home/admin/limsn/limsn/conf/artanis.conf /home/admin/.configure/limsn
+
+    sudo sed -i "s/host.name = 127.0.0.1/host.name = $IPADDRESS/" /home/admin/.configure/limsn/artanis.conf
     ## must modify ENTRY now, not artanis.conf
-    sudo sed -i "s/maxnumplates = 100/maxnumplates = $MAXNUMPLATES/"  $HOME/limsn/limsn/ENTRY 
-      
+    sudo sed -i "s/maxnumplates = 100/maxnumplates = $MAXNUMPLATES/"  /home/admin/limsn/limsn/ENTRY
+
+    
+    source /home/admin/.guix-profile/etc/profile     
+     export GUIX_LOCPATH="$HOME/.guix-profile/lib/locale"    
 }
 
 initdb()
@@ -125,8 +127,22 @@ initdb()
 
     ## note this must be in separate script:
 ##    /home/admin/ln10/install-lnpg.sh
-lnpg.sh 127.0.0.1 5432 ln_admin welcome lndb init local
 
+source /home/admin/.guix-profile/etc/profile 
+    export LC_ALL="C"
+  
+  ##  sudo chmod -R a=rwx /home/admin/ln10
+    sudo service postgresql stop
+    sudo sed -i 's/host[ ]*all[ ]*all[ ]*127.0.0.1\/32[ ]*md5/host    all        all             127.0.0.1\/32        trust/' /etc/postgresql/11/main/pg_hba.conf
+    sudo sed -i 's/\#listen_addresses =/listen_addresses =/'  /etc/postgresql/11/main/postgresql.conf
+    sudo service postgresql start
+    
+    psql -U postgres -h 127.0.0.1 postgres -a -f /home/admin/limsn/limsn/postgres/initdba.sql
+    psql -U postgres -h 127.0.0.1 lndb -a -f /home/admin/limsn/limsn/postgres/initdbb.sql
+    psql -U ln_admin -h 127.0.0.1 -d lndb -a -f /home/admin/limsn/limsn/postgres/create-db.sql
+    psql -U ln_admin -h 127.0.0.1 -d lndb -a -f /home/admin/limsn/limsn/postgres/example-data.sql   
+
+ 
     
 }
 
@@ -148,7 +164,7 @@ main()
     _msg "${PAS}LIMS*Nucleus has successfully been installed!"
 
     # Required to source /etc/profile in desktop environments.
-    _msg "${INF}Run 'nohup ~/start-limsn.sh &' to start the server in detached mode."
+    _msg "${INF}Run 'nohup ~/run-limsn.sh &' to start the server in detached mode."
  }
 
 main "$@"
