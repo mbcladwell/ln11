@@ -267,7 +267,7 @@ more. v0.5.1 contains feature enhancements required by LIMS*Nucleus")
    (source (origin
             (method url-fetch)
    ;;         (uri (string-append "file:///home/mbc/syncd/tobedeleted/limsn/limsn-0.1.tar.gz"))
-            (uri (string-append "file:///home/admin/limsn-0.1.tar.gz"))
+            (uri (string-append "file:///home/admin/ln11/limsn-0.1.tar.gz"))
             (sha256
              (base32
               "0ssi1wpaf7plaswqqjwigppsg5fyh99vdlb9kzl7c9lng89ndq1i"))))
