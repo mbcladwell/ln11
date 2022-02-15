@@ -119,9 +119,8 @@ guixinstall()
 
     init-limsn.sh	
 	
-    sudo sed -i "s/host.name = 127.0.0.1/host.name = $IPADDRESS/" $HOME/.configure/limsn/artanis.conf
-    ## must modify ENTRY now, not artanis.conf
-    sudo sed -i "s/maxnumplates = 100/maxnumplates = $MAXNUMPLATES/"  $HOME/limsn/limsn/ENTRY 
+    sudo sed -i "s/host.name = 127.0.0.1/host.name = $IPADDRESS/" /etc/artanis/artanis.conf
+    sudo sed -i "s/maxplates = 100/maxplates = $MAXNUMPLATES/"  /etc/artanis/artanis.conf 
       
 }
 
@@ -129,10 +128,7 @@ initdb()
 {
     _msg "configuring db"
 
-    ## note this must be in separate script:
-##    /home/admin/ln10/install-lnpg.sh
-lnpg.sh 127.0.0.1 5432 ln_admin welcome lndb init local
-
+install-pg-aws.sh
     
 }
 
