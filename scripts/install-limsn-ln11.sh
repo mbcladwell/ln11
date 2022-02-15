@@ -78,10 +78,8 @@ query()
     read IPADDRESS
     
     echo Maximum number of plates per plate set:
-    read MAXNUMPLATES
+    read MAXPLATES
     
-    echo Initialize database?[Y/n]
-    read INIT_DB
 }
 
 updatesys()
@@ -120,7 +118,7 @@ guixinstall()
     init-limsn.sh	
 	
     sudo sed -i "s/host.name = 127.0.0.1/host.name = $IPADDRESS/" /etc/artanis/artanis.conf
-    sudo sed -i "s/maxplates = 100/maxplates = $MAXNUMPLATES/"  /etc/artanis/artanis.conf 
+    sudo sed -i "s/maxplates = 100/maxplates = $MAXPLATES/"  /etc/artanis/artanis.conf 
       
 }
 
