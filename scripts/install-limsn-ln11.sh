@@ -86,7 +86,9 @@ updatesys()
 {
     sudo DEBIAN_FRONTEND=noninteractive apt-get --assume-yes update
     sudo DEBIAN_FRONTEND=noninteractive apt-get --assume-yes upgrade
-    sudo DEBIAN_FRONTEND=noninteractive apt-get  --assume-yes install gnupg git nscd postgresql  postgresql-contrib nano
+ ##   sudo DEBIAN_FRONTEND=noninteractive apt-get  --assume-yes install gnupg git nscd postgresql  postgresql-contrib nano
+    sudo DEBIAN_FRONTEND=noninteractive apt-get  --assume-yes install gnupg git nscd postgresql  nano
+    
 }
 
 
@@ -101,7 +103,7 @@ guixinstall()
     sudo ./ln11/scripts/guix-install-mod.sh
 
   ## using guile-3.0.2
-    guix install glibc-utf8-locales guile-dbi 
+    guix install glibc-utf8-locales 
     source $HOME/.guix-profile/etc/profile
     sudo guix install glibc-utf8-locales
     export GUIX_LOCPATH="$HOME/.guix-profile/lib/locale"

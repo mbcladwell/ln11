@@ -1,5 +1,5 @@
  
-  (define-module (limsn)
+  (define-module (labsolns limsn)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (gnu packages)
   #:use-module (gnu packages guile-xyz)
@@ -60,6 +60,13 @@
   #:use-module (gnu packages xorg)
   #:use-module (guix packages)
   #:use-module (guix download)
+  #:use-module (guix modules)
+  #:use-module (guix monads)
+   #:use-module (guix i18n)
+  #:use-module (guix records)
+  #:use-module (guix search-paths)
+   #:use-module (guix derivations)
+  #:use-module (guix store)
   #:use-module (guix git-download)
   #:use-module (guix hg-download)
   #:use-module (guix build-system cmake)
@@ -67,16 +74,20 @@
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system guile)
   #:use-module (guix utils)
-  #:use-module ((guix build utils) #:select (alist-replace))
+  #:autoload   (srfi srfi-98) (get-environment-variables)
+
+;;  #:use-module ((guix build utils) #:select (alist-replace))
+  #:use-module (guix build utils)
+  #:use-module (guix gexp)
   #:use-module (ice-9 match)
 ;  #:use-module (artanis artanis)
 ;  #:use-module (artanis utils)
 ;  #:use-module (artanis irregex)
 ;  #:use-module (artanis config)
-;  #:use-module (redis)
-;  #:use-module (json)
+;  #:use-module (guile-redis)
+;  #:use-module (guile-json-3)
   
-  #:use-module (dbi dbi)
+;  #:use-module (dbi dbi)
  #:use-module ((srfi srfi-1) #:select (alist-delete)))
 
 (define-public artanis-052
@@ -117,7 +128,7 @@
 		  (substitute* '("artanis/oht.scm"
 			       "artanis/session.scm"
 			       "artanis/cookie.scm")
-			       (("3600") "(get-conf '(cookie expire))"))
+			       (("3600") "(get-conf '(cookie expires))"))
 		
 				  (substitute* "artanis/config.scm"
 			       (("   \\(\\('debug rest ...\\) \\(parse-namespace-debug rest\\)\\)")
@@ -125,11 +136,11 @@
 				))
 		  (substitute* "artanis/config.scm"		
 			       ((" \\(else \\(error parse-namespace-cache \"Config: Invalid item\" item\\)\\)\\)\\)")
-				"(else (error parse-namespace-cache \"Config: Invalid item\" item))))\n\n(define (parse-namespace-cookie item)\n  (match item\n    (('expire expire) (conf-set! '(cookie expire) (->integer expire)))\n    (('maxplates maxplates) (conf-set! '(cookie maxplates) (->integer maxplates)))\n    (else (error parse-namespace-cookie \"Config: Invalid item\" item))))"))
+				"(else (error parse-namespace-cache \"Config: Invalid item\" item))))\n\n(define (parse-namespace-cookie item)\n  (match item\n    (('expires expires) (conf-set! '(cookie expires) (->integer expires)))\n    (('maxplates maxplates) (conf-set! '(cookie maxplates) (->integer maxplates)))\n    (else (error parse-namespace-cookie \"Config: Invalid item\" item))))"))
 
 		   (substitute* "artanis/config.scm"
 		   	       (("debug.monitor = <PATHs>\")")
-		   		"debug.monitor = <PATHs>\")\n ((cookie expire)\n       3600\n      \"Cookie expiration time in seconds.\n       1 hour is 3600\n       6 hours 21600\n       1 month 2592000\n cookie.expire = <integer>\")\n\n ((cookie maxplates)\n       10\n      \"Maximum number of plates per plate-set.\n cookie.maxplates = <integer>\")"))
+		   		"debug.monitor = <PATHs>\")\n ((cookie expires)\n       3600\n      \"Cookie expiration time in seconds.\n       1 hour is 3600\n       6 hours 21600\n       1 month 2592000\n cookie.expires = <integer>\")\n\n ((cookie maxplates)\n       10\n      \"Maximum number of plates per plate-set.\n cookie.maxplates = <integer>\")"))
 		  
 
 		   (substitute* "artanis/config.scm"
@@ -260,14 +271,17 @@ more. v0.5.1 contains feature enhancements required by LIMS*Nucleus")
     (home-page "https://www.gnu.org/software/artanis/")
     (license (list license:gpl3+ license:lgpl3+)))) ;dual license
 
-
+(define-public limsn
   (package
     (name "limsn")
     (version "0.1.0")
    (source (origin
             (method url-fetch)
-   ;;         (uri (string-append "file:///home/mbc/syncd/tobedeleted/limsn/limsn-0.1.tar.gz"))
-            (uri (string-append "file:///home/admin/ln11/limsn-0.1.tar.gz"))
+           ;; (uri (string-append "file:///home/mbc/syncd/tobedeleted/limsn/limsn-0.1.tar.gz"))
+           ;; (uri (string-append "file:///home/mbc/projects/limsn/limsn-0.1.tar.gz"))
+           ;; (uri (string-append "file:///home/admin/limsn-0.1.tar.gz"))
+	     (uri (string-append "file:///home/admin/ln11/limsn-0.1.tar.gz"))
+	    
             (sha256
              (base32
               "0ssi1wpaf7plaswqqjwigppsg5fyh99vdlb9kzl7c9lng89ndq1i"))))
@@ -279,6 +293,7 @@ more. v0.5.1 contains feature enhancements required by LIMS*Nucleus")
 				 (substitute* '("./limsn/lib/labsolns/lnpg.scm"
 						"./scripts/start-limsn.sh"
 						"./scripts/init-limsn.sh"
+						"./scripts/install-pg-aws.sh"
 						"./limsn/ENTRY")						
 						(("abcdefgh")
 						(assoc-ref outputs "out" )) )
@@ -287,22 +302,26 @@ more. v0.5.1 contains feature enhancements required by LIMS*Nucleus")
 			   (lambda _
 			     (setenv "GUILE_LOAD_PATH"
 				     (string-append "./limsn/lib:"
-						    "/gnu/store/wchn5f0frrm860vnrj0f71286xbrpw91-artanis-0.5.2/share/guile/site/3.0:"
-						    "/gnu/store/780bll8lp0xvj7rnazb2qdnrnb329lbw-guile-json-3.5.0/share/guile/site/3.0:"
+						    ;;					    "/gnu/store/wchn5f0frrm860vnrj0f71286xbrpw91-artanis-0.5.2/share/guile/site/3.0:"
+						    "/gnu/store/rgydar9dfvflqqz2irgh7njj34amaxc6-glibc-utf8-locales-2.31/lib/locale/2.31:"
+						    "/gnu/store/rj0pzbki1m5hpcshs614mhkrgs2b3i9d-artanis-0.5.2/share/guile/site/3.0:"
+						 ;;   "/gnu/store/rj0pzbki1m5hpcshs614mhkrgs2b3i9d-artanis-0.5.2/share/guile/site/3.0/lib:"
+						   "/gnu/store/780bll8lp0xvj7rnazb2qdnrnb329lbw-guile-json-3.5.0/share/guile/site/3.0:"
 						    "/gnu/store/jmn100gjcpqbfpxrhrna6gzab8hxkc86-guile-redis-2.1.1/share/guile/site/3.0:"
+						    "/gnu/store/6l8qpfg9phdbk16vz7fq46vm46jfws6a-guile-dbi-2.1.6/share/guile/site/3.0:"
 						    (getenv "GUILE_LOAD_PATH")))
 			     #t))
-                       (add-before 'install 'make-lib-dir
-			       (lambda* (#:key outputs #:allow-other-keys)
-				    (let* ((out  (assoc-ref outputs "out"))
-					   (lib-dir (string-append out "/share/guile/site/3.0/limsn/lib"))
-					   (dummy (mkdir-p lib-dir)))            				       
-				       (copy-recursively "./limsn/lib" lib-dir)
-				       #t)))
-		       (add-after 'unpack 'make-dir
+                       ;; (add-before 'install 'make-lib-dir
+		       ;; 	       (lambda* (#:key outputs #:allow-other-keys)
+		       ;; 		    (let* ((out  (assoc-ref outputs "out"))
+		       ;; 			   (lib-dir (string-append out "/share/guile/site/3.0/limsn/lib"))
+		       ;; 			   (dummy (mkdir-p lib-dir)))            				       
+		       ;; 		       (copy-recursively "./limsn/lib" lib-dir)
+		       ;; 		       #t)))
+		       (add-after 'unpack 'make-lib-dir
 				   (lambda* (#:key outputs #:allow-other-keys)
 				     (let* ((out  (assoc-ref outputs "out"))
-					   (labsolns-dir (string-append out "/labsolns"))
+					   (labsolns-dir (string-append out "/share/guile/site/3.0/labsolns"))
 					   (mkdir-p labsolns-dir)
 					   (dummy (copy-recursively "./limsn/lib/labsolns" labsolns-dir))) 
 				       #t)))
@@ -320,7 +339,9 @@ more. v0.5.1 contains feature enhancements required by LIMS*Nucleus")
 				    (let* ((out (assoc-ref outputs "out"))
 					   (bin-dir (string-append out "/bin"))
 					   (scm  "/share/guile/site/3.0")
+				;	   (lib "/labsolns")
 					   (go   "/lib/guile/3.0/site-ccache")
+				;	   (libgo   "/lib/guile/3.0/site-ccache/limsn/lib")					   
 					   (dummy (install-file "./scripts/start-limsn.sh" bin-dir))					   
 					   (dummy (chmod (string-append bin-dir "/start-limsn.sh") #o555 ))
 					   (dummy (wrap-program (string-append bin-dir "/start-limsn.sh")
@@ -329,30 +350,63 @@ more. v0.5.1 contains feature enhancements required by LIMS*Nucleus")
 					   (dummy (chmod (string-append bin-dir "/init-limsn.sh") #o555 ))
 					   (dummy (wrap-program (string-append bin-dir "/init-limsn.sh")
 						    `( "PATH" ":" prefix  (,bin-dir) )))
-					   (dummy (install-file "./scripts/lnpg.sh" bin-dir))					   
-					   (dummy (chmod (string-append bin-dir "/lnpg.sh") #o555 ))) ;;read execute, no write
-				      (wrap-program (string-append bin-dir "/lnpg.sh")
+					   (dummy (install-file "./scripts/install-pg-aws.sh" bin-dir))					   
+					   (dummy (chmod (string-append bin-dir "/install-pg-aws.sh") #o555 ))) ;;read execute, no write
+				      (wrap-program (string-append bin-dir "/install-pg-aws.sh")
 						    `( "PATH" ":" prefix  (,bin-dir) )
                                                       `("GUILE_LOAD_PATH" prefix
-						       (,(string-append out scm)))						
+							(,(string-append out scm)))
+						       `("GUILE_LOAD_PATH" prefix  ;;this put (labsolns ....) on the path
+							                 (,out) )    ;; and makes the lib available
+						;;	(,(string-append out lib)))   
 						     `("GUILE_LOAD_COMPILED_PATH" prefix
 						       (,(string-append out go)))
+					;;	       `("GUILE_LOAD_COMPILED_PATH" prefix
+					;;	       (,(string-append out libgo)))
 						    )		    
 				      #t)))
-				      				   		      				     
-				      			    		     		             
-		       )))
-    (inputs
+		       ;; (add-before 'check 'init-app
+		       ;; 		   (with-imported-modules
+		       ;; 		    '((guix build utils))
+		       ;; 		    #~(begin
+		       ;; 			(use-modules (guix build utils))                   
+		       ;; 			  (let* ((home "/home/admin")
+		       ;; 				 (dummy (with-directory-excursion home
+		       ;; 								  (invoke "mkdir" "-p" "./.config/limsn" )))
+		       ;; 				 )
+		       ;; 			    #t)
+					
+		       ;; 			))
+		       ;; 		   )
+		       
+		       ;; (add-before 'check 'init-app
+		       ;; 		  (lambda* (#:key inputs outputs #:allow-other-keys)
+		       ;; 			  (let* ((home (getenv "HOME"))
+		       ;; 				 (dummy (with-directory-excursion home
+		       ;; 								  (invoke "mkdir" "-p" "./.config/limsn" )))
+		       ;; 				 )
+		       ;; 			    #t)					
+		       ;; 			))				   
+
+		       ;; (add-before 'check 'init-app
+		       ;; 		   (lambda* (#:key inputs outputs #:allow-other-keys)
+		       ;; 		     (let* (
+		       ;; 			    (dummy (mkdir-p "/tmp/artanis2" )))
+		       ;; 		       #t )
+		       ;; 		     ))				   
+	     )))
+  (inputs
      `(("guile" ,guile-3.0)
-       ("gnuplot" ,gnuplot)
-       ("guile-dbi" ,guile-dbi)
+      
          ))
 
     (propagated-inputs
 	`(
 	  ("artanis" ,artanis-052)
-;;	  ("guile-json" ,guile-json-3)
-;;	  ("guile-redis" ,guile-redis)
+	  ("gnuplot" ,gnuplot)
+	  ("guile-dbi" ,guile-dbi)
+;	  ("guile-json" ,guile-json-3)
+;	  ("guile-redis" ,guile-redis)
   		))
     (native-inputs
      `(("bash"       ,bash)         ;for the `source' builtin
@@ -365,8 +419,8 @@ more. v0.5.1 contains feature enhancements required by LIMS*Nucleus")
     (synopsis "Microwell Plate management Software")
     (description "description")
     (home-page "http://www.labsolns.com/")
-    (license (list license:gpl3+ license:lgpl3+))) ;dual license
+    (license (list license:gpl3+ license:lgpl3+)))) ;dual license
 
 
-
+limsn
 
