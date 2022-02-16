@@ -87,7 +87,7 @@ updatesys()
     sudo DEBIAN_FRONTEND=noninteractive apt-get --assume-yes update
     sudo DEBIAN_FRONTEND=noninteractive apt-get --assume-yes upgrade
  ##   sudo DEBIAN_FRONTEND=noninteractive apt-get  --assume-yes install gnupg git nscd postgresql  postgresql-contrib nano
-    sudo DEBIAN_FRONTEND=noninteractive apt-get  --assume-yes install gnupg git nscd postgresql  nano
+    sudo DEBIAN_FRONTEND=noninteractive apt-get  --assume-yes install gnupg git nscd nano
     
 }
 
