@@ -1,10 +1,9 @@
  
   (define-module (labsolns limsn)
-  #:use-module ((guix licenses) #:prefix license:)
+    #:use-module ((guix licenses) #:prefix license:)
+      #:use-module (gnu packages guile-xyz)
+
   #:use-module (gnu packages)
-  #:use-module (gnu packages guile-xyz)
-  #:use-module (gnu packages algebra)
-  #:use-module (gnu packages aspell)
   #:use-module (gnu packages autotools)
   #:use-module (gnu packages avahi)
   #:use-module (gnu packages base)
@@ -13,9 +12,6 @@
   #:use-module (gnu packages crypto)
   #:use-module (gnu packages databases)
   #:use-module (gnu packages disk)
-  #:use-module (gnu packages emacs)
-  #:use-module (gnu packages emacs-xyz)
-  #:use-module (gnu packages gawk)
   #:use-module (gnu packages gettext)
   #:use-module (gnu packages gl)
   #:use-module (gnu packages glib)
@@ -45,19 +41,10 @@
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python)
   #:use-module (gnu packages readline)
-  #:use-module (gnu packages sdl)
-  #:use-module (gnu packages search)
-  #:use-module (gnu packages serialization)
-  #:use-module (gnu packages slang)
-  #:use-module (gnu packages sqlite)
-  #:use-module (gnu packages swig)
   #:use-module (gnu packages tex)
   #:use-module (gnu packages texinfo)
   #:use-module (gnu packages tls)
   #:use-module (gnu packages version-control)
-  #:use-module (gnu packages webkit)
-  #:use-module (gnu packages xdisorg)
-  #:use-module (gnu packages xorg)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix modules)
@@ -69,10 +56,7 @@
   #:use-module (guix store)
   #:use-module (guix git-download)
   #:use-module (guix hg-download)
-  #:use-module (guix build-system cmake)
-  #:use-module (guix build-system glib-or-gtk)
   #:use-module (guix build-system gnu)
-  #:use-module (guix build-system guile)
   #:use-module (guix utils)
   #:autoload   (srfi srfi-98) (get-environment-variables)
 
@@ -80,14 +64,37 @@
   #:use-module (guix build utils)
   #:use-module (guix gexp)
   #:use-module (ice-9 match)
+;; may not need ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;  #:use-module (artanis artanis)
 ;  #:use-module (artanis utils)
 ;  #:use-module (artanis irregex)
 ;  #:use-module (artanis config)
 ;  #:use-module (guile-redis)
 ;  #:use-module (guile-json-3)
+  ;;  #:use-module (dbi dbi)
+
+  ;;testing
+  #:use-module (guix build-system cmake)
+  #:use-module (guix build-system glib-or-gtk)
+  #:use-module (guix build-system guile)
+  #:use-module (gnu packages algebra)
+  #:use-module (gnu packages aspell)
+  #:use-module (gnu packages emacs)
+  #:use-module (gnu packages emacs-xyz)
+  #:use-module (gnu packages gawk)
+  #:use-module (gnu packages sdl)
+  #:use-module (gnu packages search)
+  #:use-module (gnu packages serialization)
+  #:use-module (gnu packages slang)
+  #:use-module (gnu packages sqlite)
+  #:use-module (gnu packages swig)
+  #:use-module (gnu packages webkit)
+  #:use-module (gnu packages xdisorg)
+  #:use-module (gnu packages xorg)
+
+
   
-;  #:use-module (dbi dbi)
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  #:use-module ((srfi srfi-1) #:select (alist-delete)))
 
 (define-public artanis-052
@@ -278,9 +285,9 @@ more. v0.5.1 contains feature enhancements required by LIMS*Nucleus")
    (source (origin
             (method url-fetch)
            ;; (uri (string-append "file:///home/mbc/syncd/tobedeleted/limsn/limsn-0.1.tar.gz"))
-           ;; (uri (string-append "file:///home/mbc/projects/limsn/limsn-0.1.tar.gz"))
+            (uri (string-append "file:///home/mbc/projects/limsn/limsn-0.1.tar.gz"))
            ;; (uri (string-append "file:///home/admin/limsn-0.1.tar.gz"))
-	     (uri (string-append "file:///home/admin/ln11/limsn-0.1.tar.gz"))
+	   ;;  (uri (string-append "file:///home/admin/ln11/limsn-0.1.tar.gz"))
 	    
             (sha256
              (base32
@@ -304,7 +311,7 @@ more. v0.5.1 contains feature enhancements required by LIMS*Nucleus")
 				     (string-append "./limsn/lib:"
 						    ;;					    "/gnu/store/wchn5f0frrm860vnrj0f71286xbrpw91-artanis-0.5.2/share/guile/site/3.0:"
 						    "/gnu/store/rgydar9dfvflqqz2irgh7njj34amaxc6-glibc-utf8-locales-2.31/lib/locale/2.31:"
-						    "/gnu/store/rj0pzbki1m5hpcshs614mhkrgs2b3i9d-artanis-0.5.2/share/guile/site/3.0:"
+						    "/gnu/store/bhhgrxslz5d00hrbjnfrpclgg0phdryh-artanis-0.5.2/share/guile/site/3.0:"
 						 ;;   "/gnu/store/rj0pzbki1m5hpcshs614mhkrgs2b3i9d-artanis-0.5.2/share/guile/site/3.0/lib:"
 						   "/gnu/store/780bll8lp0xvj7rnazb2qdnrnb329lbw-guile-json-3.5.0/share/guile/site/3.0:"
 						    "/gnu/store/jmn100gjcpqbfpxrhrna6gzab8hxkc86-guile-redis-2.1.1/share/guile/site/3.0:"
@@ -388,12 +395,12 @@ more. v0.5.1 contains feature enhancements required by LIMS*Nucleus")
 		       ;; 			    #t)					
 		       ;; 			))				   
 
-		       ;; (add-before 'check 'init-app
-		       ;; 		   (lambda* (#:key inputs outputs #:allow-other-keys)
-		       ;; 		     (let* (
-		       ;; 			    (dummy (mkdir-p "/tmp/artanis2" )))
-		       ;; 		       #t )
-		       ;; 		     ))				   
+		       (add-before 'check 'init-app
+				   (lambda* (#:key inputs outputs #:allow-other-keys)
+				     (let* (
+					    (dummy (mkdir-p "/tmp/artanis2" )))
+				       #t )
+				     ))				   
 	     )))
   (inputs
      `(("guile" ,guile-3.0)
@@ -405,6 +412,7 @@ more. v0.5.1 contains feature enhancements required by LIMS*Nucleus")
 	  ("artanis" ,artanis-052)
 	  ("gnuplot" ,gnuplot)
 	  ("guile-dbi" ,guile-dbi)
+	  ("postgresql" ,postgresql)
 ;	  ("guile-json" ,guile-json-3)
 ;	  ("guile-redis" ,guile-redis)
   		))
