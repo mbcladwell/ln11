@@ -170,7 +170,7 @@ echo	"(branch \"master\")" >> ~/.config/guix/channels.scm
 echo    ";; Enable signature verification:" >> ~/.config/guix/channels.scm
 echo    "(introduction" >> ~/.config/guix/channels.scm
 echo     "(make-channel-introduction" >> ~/.config/guix/channels.scm
-echo      "\"1d6418bca78f0ea76e258a4842bfbe46cf76cbba\"" >> ~/.config/guix/channels.scm
+echo      "\"945733b9d6d9d228c4626d846ab58fee2eb11d73\"" >> ~/.config/guix/channels.scm
 echo      "(openpgp-fingerprint" >> ~/.config/guix/channels.scm
 echo       "\"E709 94D1 9CB0 FE2B CAC4  9E54 0BF8 F292 4D2B 1944\"))))" >> ~/.config/guix/channels.scm
 echo   "%default-channels)" >> ~/.config/guix/channels.scm
